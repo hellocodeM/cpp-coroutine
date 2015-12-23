@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <ucontext.h>
 
+#include "CoroutineScheduler.hpp"
+
 namespace ming {
 namespace coroutine {
 
@@ -14,19 +16,14 @@ using co_function_t = std::function<void()>;
 using co_function_ptr = void (*)();
 using co_id_t = std::size_t;
 
-enum CoState {
-    kReady,
-    kRunning,
-    kYield,
-    kFinish
-};
+enum CoState { kReady, kRunning, kYield, kFinish };
 
 struct Coroutine {
     Coroutine() = delete;
     Coroutine(const Coroutine&) = default;
 
     Coroutine(co_function_t, co_id_t);
-    
+
     /**
      * Resume coroutine.
      */
@@ -42,13 +39,13 @@ struct Coroutine {
 /**
  * Create a coroutine.
  */
-Coroutine coroutine(co_function_t fn);
+Coroutine coroutine(co_function_t fn) { return get_scheduler().Create(fn); }
 
 /**
- * Yield a coroutine.
+ * Yield the coroutine.
  */
-void yield();
+void yield() { get_scheduler().Yield(); }
 
-}/* end of namespace coroutine */
-}/* end of namespace ming */
+} /* end of namespace coroutine */
+} /* end of namespace ming */
 #endif

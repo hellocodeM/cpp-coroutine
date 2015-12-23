@@ -10,16 +10,9 @@ Coroutine::Coroutine(co_function_t f, co_id_t id): fn(f), cid(id) {
 }
 
 void Coroutine::operator() () {
-
+    get_scheduler().Resume(this->cid);
 }
 
-Coroutine coroutine(co_function_t fn) {
-
-}
-
-void yield() {
-
-}
 
 } /* end of namespace coroutine */
 } /* end of namespace ming */
