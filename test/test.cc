@@ -11,7 +11,7 @@ void foo() {
 }
 
 int main() {
-    auto c = co::coroutine(foo);
+    auto& c = co::coroutine(foo);
     c();
     c();
     return 0;

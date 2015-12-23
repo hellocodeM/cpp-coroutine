@@ -7,20 +7,17 @@
 #include <stdint.h>
 #include <ucontext.h>
 
+#include "types.hpp"
 #include "CoroutineScheduler.hpp"
 
 namespace ming {
 namespace coroutine {
 
-using co_function_t = std::function<void()>;
-using co_function_ptr = void (*)();
-using co_id_t = std::size_t;
-
 enum CoState { kReady, kRunning, kYield, kFinish };
 
 struct Coroutine {
     Coroutine() = delete;
-    Coroutine(const Coroutine&) = default;
+    Coroutine(const Coroutine&) = delete;
 
     Coroutine(co_function_t, co_id_t);
 
@@ -34,18 +31,18 @@ struct Coroutine {
     co_function_t fn;
     co_id_t cid;
     ucontext_t context;
+    CoState state;
 };
 
 /**
  * Create a coroutine.
  */
-Coroutine coroutine(co_function_t fn) { return get_scheduler().Create(fn); }
+Coroutine& coroutine(co_function_t fn);
 
 /**
  * Yield the coroutine.
  */
-void yield() { get_scheduler().Yield(); }
-
+void yield();
 } /* end of namespace coroutine */
 } /* end of namespace ming */
 #endif
