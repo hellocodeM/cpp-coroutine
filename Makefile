@@ -2,15 +2,27 @@ CC = g++
 CFLAGS = -std=c++14 -Wall -Iinclude/ -g
 SRCS = $(shell find src/ -name "*.cc")
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
+DYNAMIC_LIB = libcoroutine.so
 TEST_SRC = test/test.cc
-TEST_OBJ = test/test
+TEST_OBJ = test/test.o
+TEST_TARGET = test/test
 
-test: $(TEST_SRC) $(SRCS) 
-	$(CC) $(CFLAGS) $(TEST_SRC) $(SRCS) -o $(TEST_OBJ)
-	$(TEST_OBJ)
+all: $(OBJS)
 
-debug: test $(TEST_OBJ)
-	cgdb $(TEST_OBJ)
+test: $(TEST_TARGET)
+	@echo "开始执行测试程序"
+	$(TEST_TARGET)
+
+debug: $(TEST_TARGET)
+	cgdb $(TEST_TARGET)
+
+$(TEST_TARGET): $(TEST_OBJ) $(OBJS)
+	$(CC) $(CFLAGS) $(SRCS) $(TEST_SRC) -o $@
+
+%.o: %.cc
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean
 
 clean:
-	rm $(TARGET) $(TEST_OBJ)
+	rm $(TEST_OBJ) $(OBJS) $(TEST_TARGET)
