@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -std=c++14 -Wall -Iinclude/ -g
 SRCS = $(shell find src/ -name "*.cc")
+HEADERS = $(shell find include/ -name "*.hpp")
 OBJS = $(patsubst %.cc, %.o, $(SRCS))
 DYNAMIC_LIB = libcoroutine.so
 TEST_SRC = test/test.cc
@@ -19,7 +20,7 @@ debug: $(TEST_TARGET)
 $(TEST_TARGET): $(TEST_OBJ) $(OBJS)
 	$(CC) $(CFLAGS) $(SRCS) $(TEST_SRC) -o $@
 
-%.o: %.cc
+%.o: %.cc  $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
