@@ -3,12 +3,29 @@
 namespace ming {
 namespace coroutine {
 
-void Coroutine::CoroutineGuard(Coroutine* co) {
-    co->fn_();
-    setcontext(&co->main_ctx_);
+Coroutine::Coroutine(co_function_t fn) : fn_(fn) {
+    ctx_.uc_stack.ss_sp = &stack_;
+    ctx_.uc_stack.ss_size = kStackSize;
+    ctx_.uc_stack.ss_flags = 0;
+}
+
+void Coroutine::Resume() {
+    RESUME_UPPER_HALF
+    RESUME_LOWER_HALF
+}
+
+void Coroutine::Yield() {
+    state_ = kYield;
+    swapcontext(&ctx_, &main_ctx_);
+}
+
+void Coroutine::CoroutineGuard() {
+    this->fn_();
+    setcontext(&this->main_ctx_);
 }
 
 void yield() {
+    assert(g_current && "no coroutine is running");
     g_current->Yield();
 }
 

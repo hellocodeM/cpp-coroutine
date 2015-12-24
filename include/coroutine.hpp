@@ -10,6 +10,7 @@ namespace ming {
 namespace coroutine {
 
 class Coroutine;
+
 /* current running coroutine */
 extern Coroutine* g_current;
 
@@ -18,11 +19,7 @@ public:
     Coroutine() = delete;
     Coroutine(const Coroutine&) = delete;
 
-    Coroutine(co_function_t fn) : fn_(fn) {
-        ctx_.uc_stack.ss_sp = &stack_;
-        ctx_.uc_stack.ss_size = kStackSize;
-        ctx_.uc_stack.ss_flags = 0;
-    }
+    Coroutine(co_function_t);
 
     ~Coroutine() = default;
 
@@ -32,10 +29,10 @@ public:
  */
 #define RESUME_UPPER_HALF                                   \
     union {                                                 \
-        void (*fn)(Coroutine*);                             \
+        void (Coroutine::*fn)();                            \
         co_function_ptr ptr;                                \
     } ptr_converter;                                        \
-    ptr_converter.fn = &CoroutineGuard;                     \
+    ptr_converter.fn = &Coroutine::CoroutineGuard;          \
     g_current = this;                                       \
     switch (state_) {                                       \
         case kReady:                                        \
@@ -51,7 +48,7 @@ public:
     case kFinish:         \
     default:              \
         assert(false);    \
-    }
+        }
 
     /**
      * Resume the coroutine, and expect the return value of the coroutine.
@@ -82,10 +79,7 @@ public:
     /**
      * Resume, return nothing.
      */
-    void Resume() {
-        RESUME_UPPER_HALF
-        RESUME_LOWER_HALF
-    }
+    void Resume();
 
     /**
      * Yield the coroutine, and return a value.
@@ -112,18 +106,15 @@ public:
     /**
      * Yield, return nothing.
      */
-    void Yield() {
-        state_ = kYield;
-        swapcontext(&ctx_, &main_ctx_);
-    }
+    void Yield();
 
 private:
-    /** 
+    /**
      * To invoke a lambda by the function pointer,
      * we need to wrap the std::function by a plain function.
      * Its' another job is going back the main context.
      */
-    static void CoroutineGuard(Coroutine* co);
+    void CoroutineGuard();
 
     /* data members */
     ucontext_t ctx_, main_ctx_;
@@ -137,6 +128,7 @@ private:
  */
 template <class T>
 void yield(T&& x) {
+    assert(g_current && "no coroutine is running!");
     g_current->Yield(std::forward<T>(x));
 }
 
