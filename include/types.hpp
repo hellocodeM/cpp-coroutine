@@ -7,7 +7,8 @@
 namespace ming {
 namespace coroutine {
 
-constexpr size_t kStackSize = 10240;
+// the stack size is 4KB
+constexpr size_t kStackSize = 4 * 1024;
 
 using co_function_t = std::function<void()>;
 using co_function_ptr = void (*)();
