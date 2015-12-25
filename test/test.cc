@@ -8,7 +8,7 @@
 namespace co = ming::coroutine;
 
 void foo() {
-    puts("marry");
+    puts("merry");
     co::yield(1);
     puts("christmas");
     co::yield("foo");
