@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 
 #include "coroutine.hpp"
 
@@ -31,5 +32,9 @@ int main() {
     assert(strcmp(co_bar.Resume<const char*>(), "bar") == 0);
     co_foo.Resume();
     co_bar.Resume();
+    std::cout << "coroutine size: "<< sizeof(co::Coroutine) << "\n";
+    std::cout << "ucontext_t size: "<< sizeof(ucontext_t) << " * 2\n";
+    std::cout << "std::function size: "<< sizeof(std::function<void()>) << "\n";
+    std::cout << "std::unique_ptr size: "<< sizeof(std::unique_ptr<co::co_stack_t>) << "\n";
     return 0;
 }

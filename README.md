@@ -3,8 +3,8 @@ A simple cpp coroutine implementation.
 
 # features
 - the coroutine could be manually yield and resume
-- when yielded, the coroutine could transmit a variable to the caller
-- the coroutine could transmit any type of variable
+- when yielding, the coroutine could transmit a variable of any type to the caller
+- using copy stack to reduce the memory used by coroutine, which is 1928B
 
 # demo
 ```c++
